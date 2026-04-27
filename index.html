@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>STARLIGHT</title>
+
+        <!-- ICON CDN -->
+        <link
+            href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                font-family: Arial;
+                background: #0f172a;
+                color: white;
+            }
+
+            /* WELCOME */
+            #welcome {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+
+            #welcome button {
+                margin-top: 20px;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 12px;
+                background: #334155;
+                color: white;
+            }
+
+            /* HEADER */
+            .header {
+                padding: 15px;
+                text-align: center;
+                font-size: 20px;
+            }
+
+            /* GRID */
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .menu-card {
+                background: #1e293b;
+                padding: 20px;
+                border-radius: 18px;
+                text-align: center;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+            .menu-card i {
+                font-size: 30px;
+            }
+
+            .menu-card:hover {
+                transform: scale(1.05);
+            }
+
+            /* CARD */
+            .card {
+                width: 100%;
+                max-width: 400px;
+                height: 250px;
+                margin: auto;
+                perspective: 1000px;
+            }
+
+            /* FLIP */
+            .inner {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: 0.6s;
+            }
+
+            .flip {
+                transform: rotateY(180deg);
+            }
+
+            .face {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                background: #1e293b;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .back {
+                transform: rotateY(180deg);
+            }
+
+            /* OPTION */
+            .option {
+                background: #334155;
+                padding: 10px;
+                margin-top: 10px;
+                border-radius: 10px;
+            }
+
+            .correct {
+                background: green;
+            }
+            .wrong {
+                background: red;
+            }
+
+            /* BTN */
+            .btn {
+                margin-top: 10px;
+                padding: 10px;
+                width: 100%;
+                border: none;
+                border-radius: 10px;
+                background: #334155;
+                color: white;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="welcome">
+            <h1>Welcome back 👋</h1>
+            <p>Study smarter, not harder</p>
+            <button onclick="startApp()">Start</button>
+        </div>
+
+        <div id="main" style="display: none">
+            <div class="header">STARLIGHT-CCA STUDY APPS</div>
+            <div id="app"></div>
+        </div>
+
+        <script>
+            // ================= RAW =================
+            const rawData = `
+1.	Apa yang agar aku temukan di tengah-tengahmu? (Menurut Roma 1:13)
+Jawaban: buah
+2.	Apa yang akan menimpa setiap orang yang hidup yang berbuat jahat? (Menurut Roma 2:9)
+Jawaban: Penderitaan dan kesesakan.
+3.	Apa yang memang ada gunanya, jika engkau mentaati hukum Taurat? (Menurut Roma 2:25)
+Jawaban: Sunat.
+4.	Apa yang tidak ada lagi gunanya jika engkau melanggar hukum Taurat? (Menurut Roma 2:25)
+Jawaban: Sunatmu.
+5.	Apa yang mengandung bisa? (Menurut Roma 3:13)
+Jawaban: Bibir mereka.
+6.	Apa yang merayu-rayu? (Menurut Roma 3:13)
+Jawaban: Lida mereka.
+7.	Apa yang penuh dengan sumpah serapah? (Menurut Roma 3:14)
+Jawaban: Mulut mereka.
+8.	Apa yang tidak mereka kenal? (Menurut Roma 3:17)
+Jawaban: Jalan damai.
+9.	Apa yang tidak ada pada mereka? (Menurut Roma 3:18)
+Jawaban: Rasa takut kepada Allah
+10.	Apa yang kita serukan oleh Roh itu? (Menurut Roma 8:15)
+Jawaban: Ya Abba, ya Bapa.
+11.	Apakah yang dinyatakan oleh kebangkitan-Nya dari antara orang mati menurut Roh kekudusan? (Menurut Roma 1:4)
+Jawaban: Bahwa Ia adalah Anak Allah yang berkuasa, Yesus Kristus Tuhan kita.
+12.	Apakah yang kami terima untuk menuntun semua bangsa dengan perantaraan-Nya? (Menurut Roma 1:5)
+Jawaban: Kasih karunia dan jabatan rasul. 
+13.	Apakah yang Paulus mau,supaya kamu mengetahui itu, tetapi hingga kini selalu Paulus terhalang? (Menurut Roma 1:13)
+Jawaban: Bahwa aku telah sering berniat untuk datang kepadamu.
+14.	Apakah yang dapat nampak kepada pikiran dari karya-Nya sejak dunia diciptakan sehingga mereka tidak dapat berdalih? (Menurut Roma 1:20)
+Jawaban: Apa yang tidak nampak dari pada-Nya, yaitu kekuatan-Nya yang kekal dan keilahian-Nya.
+15.	Apakah maksud kemurahan Allah? (Menurut Roma 2:4)
+Jawaban: Ialah menuntun engkau kepada pertobatan.
+16.	Apakah yang akan diperoleh semua orang yang berbuat baik? (Menurut Roma 2:10)
+Jawaban: Kemuliaan, kehormatan dan damai sejahtera.
+17.	Apakah yang mereka tunjukkan? (Menurut Roma 2:15)
+Jawaban: bahwa isi hukum Taurat ada tertulis di dalam hati mereka dan suara hati mereka turut Bersaksi dan pikiran mereka saling menuduh atau saling membela.
+18.	Apakah yang ada tertulis? (Menurut Roma 2:24)
+Jawaban: Sebab oleh karena kamulah nama Allah dihujat di antara bangsa-bangsa lain.
+19.	Apakah yang mereka tinggalkan di jalan mereka? (Menurut Roma 3:16)
+Jawaban: Keruntuhan dan kebinasaan mereka
+20.	Apakah yang kami yakin? (Menurut Roma 3:28)
+Jawaban: bahwa manusia dibenarkan karena iman, dan bukan karena ia melakukan hukum Taurat.
+21.	Apakah kata-kata ini yang tidak ditulis untuk Abraham saja? (Menurut Roma 4:23)
+Jawaban: yaitu “hal ini diperhitungkan kepadanya,”
+22.	Apakah yang oleh satu pelanggaran semua orang peroleh? (Menurut Roma 5:18)
+Jawaban: Penghukuman.
+23.	Apakah yang oleh satu perbuatan kebenaran semua orang peroleh? (Menurut Roma 5:18)
+Jawaban: Pembenaran untuk hidup
+24.	Apakah kesudahan semuanya itu? (Menurut Roma 6:21)
+Jawaban: Ialah kematian.
+25.	Apakah yang kamu peroleh setelah kamu dimerdekakan dari dosa dan setelah kamu menjadi hamba Allah? (Menurut Roma 6:22)
+Jawaban: Buah yang membawa kamu kepada pengudusan dan sebagai kesudahannya ialah hidup yang kekal.
+26.	Apakah yang aku setujui jika aku perbuat apa yang tidak aku kehendaki? (Menurut Roma 7:16)
+Jawaban: Bahwa hukum Taurat itu baik.
+27.	Apakah yang telah kita terima? (Menurut Roma 8:23)
+Jawaban: Karunia sulung Roh.
+28.	Apakah yang ada tertulis? (Menurut Roma 8:36)
+Jawaban: Oleh karena Engkau kami ada dalam bahaya maut sepanjang hari, kami telah dianggap sebagai domba-domba Sembelihan.
+29.	Apakah yang aku yakin? (Menurut Roma 8:38-39)
+Jawaban: Bahwa baik maut, maupun hidup, baik malaikat-malaikat, maupun pemerintah-pemerintah, baik yang ada Sekarang, maupun yang akan datang, atau kuasa-kuasa, baik yang di atas maupun yang di bawah ataupun Sesuatu makhluk lain tidak akan dapat memisahkan kita dari kasih Allah yang ada di dalam Kristus  Yesus Tuhan kita.
+30.	Apakah yang ada dalam Kristus Yesus Tuhan kita? (Menurut Roma 8:39)
+Jawaban: Kasih Allah
+31.	Apakah yang dikatakan kepada Ribka? (Menurut Roma 9:12)
+Jawaban: Anak yang tua akan menjadi hamba anak yang muda.
+32.	Apakah Firman Tuhan kepada Musa? (Menurut Roma 9:15)
+Jawaban: Aku akan menaruh belas kasihan kepada siapa Aku mau menaruh belas kasihan dan Aku akan bermurah hati kepada Siapa Aku mau bermurah hati.
+33.	Apakah yang diserukan Yesaya tentang Israel? (Menurut Roma 9:27)
+Jawaban: Sekalipun jumlah anak Israel seperti pasir di laut, namun hanya sisanya akan diselamatkan.
+34.	Apakah yang Aku letakkan di Sion? (Menurut Roma 9:33)
+Jawaban: Sebuah batu sentuhan dan sebuah batu sandungan.
+35.	Apakah keinginan hatiku dan doaku kepada Tuhan? (Menurut Roma 10:1)
+Jawaban: Ialah Supaya mereka diselamatkan.
+36.	Apakah yang ditulis Musa tentang kebenaran karena hukum taurat? (Menurut Roma 10:5)
+Jawaban: Orang yang melakukannya, akan hidup karenanya.
+37.	Apakah yang dikatakan kebenaran karena iman? (Menurut Roma 10:6)
+Jawaban: Demikian Jangan katakan di dalam hatimu : siapakah akan naik ke sorga?
+38.	Apakah itulah Firman iman, yang kami beritakan? (Menurut Roma 10:8)
+Jawaban: Ini: Firman itu dekat kepadamu yakni di dalam mulutmu dan di dalam hatimu.
+39.	Apakah yang dikatakan kitab suci? (Menurut Roma 10:11)
+Jawaban: Barangsiapa yang percaya kepada Dia, tidak akan dipermalukan.
+40.	Apakah yang pertama-tama Musa katakan? (Menurut Roma 10:19)
+Jawaban: Aku menjadikan kamu cemburu terhadap orang-orang yang bukan umat dan membangkitkan amarahmu Terhadap bangsa yang bebal.
+41.	Apakah yang dikatakan Yesaya dengan berani? (Menurut Roma 10:20)
+Jawaban: Aku telah berkenan ditemukan mereka yang tidak mencari Aku, Aku telah menampakkan diri kepada mereka Yang tidak menanyakan Aku.
+42.	Apakah yang Ia katakan tentang Israel? (Menurut Roma 10:21)
+Jawaban: Sepanjang hari Aku telah mengulurkan tangan-Ku kepada bangsa yang tidak taat dan yang membantah.
+43.	Apakah yang Daud katakan? (Menurut Roma 11:9)
+Jawaban: Biarlah jamuan mereka menjadi jerat dan perangkap, penyesatan dan pembalasan bagi mereka.
+44.	Apakah yang ada tertulis? (Menurut Roma 11:26)
+Jawaban: Dari Sion akan datang penebus, Ia akan menyingkirkan segala kefasikan dari pada Yakub.
+45.	Apakah itu yang adalah ibadahmu yang sejati? (Menurut Roma 12:1)
+Jawaban: Mempersembahkan tubuhmu sebagai persembahan yang hidup, yang kudus dan yang berkena kepada Allah.
+46.	Apakah yang a k u katakan kepada setiap orang di antara kamu? (Menurut Roma 12:3)
+Jawaban: Janganlah kamu memikirkan hal-hal yang lebih tinggi dari pada yang patut kamu pikirkan, tetapi hendaklah kamu Berpikir begitu rupa, sehingga kamu menguasai diri menurut ukuran iman, yang dikaruniakan Allah kepada kamu Masing-masing.
+47.	Apakah yang marilah kita tanggalkan? (Menurut Roma 13:12)
+Jawaban: Perbuatan-perbuatan kegelapan.
+48.	Apakah yang dikenakan? (Menurut Roma 13:12)
+Jawaban: Perlengkapan senjata terang.
+49.	Apakah yang lebih baik kamu anut? (Menurut Roma 14:13)
+Jawaban: Pandangan ini Jangan kita membuat saudara kita jatuh atau tersandung.
+50.	Apakah yang janganlah kamu biarkan difitnah? (Menurut Roma 14:16)
+Jawaban: Apa yang baik, yang kamu miliki.
+51.	Apakah yang telah dikerjakan Kristus olehku? (Menurut Roma 15:18)
+Jawaban: Yaitu untuk memimpin bangsa-bangsa lain kepada ketaatan, oleh perkataan dan perbuatan.
+52.	Apakah yang dilayani orang-orang yang tidak melayani Kristus Tuhan kita? (Menurut Roma 16:18)
+Jawaban: Melayani perut mereka sendiri.
+53.	Apakah yang bagi Dia, satu-satunya Allah yang penuh hikmat, oleh Yesus Kristus? (menurut Roma 16:27)
+Jawaban: segala kemuliaan sampai selama-lamanya! Amin.
+54.	Bagaimanakah Ia akan membalas setiap orang? (Menurut Roma 2:6-7)
+Jawaban: Menurut perbuatannya yaitu hidup kekal kepada mereka yang dengan tekun berbuat baik mencari kemuliaan, Kehormatan dan ketidakbinasaan, tetapi murka dan geram kepada mereka yang mencari kepentingan sendiri yang tidak Taat kepada kebenaran melainkan taat kepada kelaliman.
+55.	Bagaimanakah kerongkongan mereka? (Menurut Roma 3:13)
+Jawaban: Seperti kubur yang ternganga.
+56.	Bagaimanakah isi surat yang ditulis rasul Paulus? (Menurut Roma 3:23)
+Jawaban: Karena semua orang telah berbuat dosa dan telah kehilangan kemuliaan Allah,
+57.	Bagaimanakah kita juga mengeluh dalam hati kita? (Menurut Roma 8:23)
+Jawaban: Sambil menantikan pengangkatan sebagai anak yaitu pembebasan tubuh kita.
+58.	Bilamanakah mereka bukan saja melakukannya sendiri tetapi mereka juga setuju dengan mereka yang melakukannya? (Menurut Roma 1:32)
+Jawaban: Walaupun mereka mengetahui tuntutan-tuntutan hukum Allah yaitu bahwa setiap orang yang melakukan hal-hal Demikian patut dihukum mati.
+59.	Bilamanakah maka walaupun mereka tidak memiliki hukum Taurat mereka menjadi hukum Taurat bagi diri mereka sendiri? (Menurut Roma 2:14)
+Jawaban: Apabila bangsa-bangsa lain yang tidak memiliki hukum Taurat oleh dorongan diri sendiri melakukan apa yang Dituntut hukum Taurat.
+60.	Bilamanakah maka ia beroleh dasar untuk bermegah tetapi tidak di hadapan Allah? (Menurut Roma 4:2)
+Jawaban: Jikalau Abraham dibenarkan karena perbuatannya.
+61.	Bilamanakah maka lebih benar lagi mereka yang telah menerima kelimpahan kasih karunia dan anugerah kebenaran akan hidup dan berkuasa oleh karena satu orang itu yaitu Yesus Kristus? (Menurut Roma 5:17)
+Jawaban: Jika oleh dosa satu orang maut telah berkuasa oleh satu orang itu
+62.	Bilamanakah maka bukan lagi aku yang memperbuatnya tetapi dosa yang diam di dalam aku? (Menurut Roma 7:20)
+Jawaban: Jika aku berbuat apa yang tidak aku kehendaki.
+63.	Bilamanakah maka tubuh memang mati karena dosa tetapi roh adalah kehidupan oleh karena kebenaran? (Menurut Roma 8:10)
+Jawaban: Jika Kristus ada di dalam kamu.
+64.	Bilamanakah maka Ia yang telah membangkitkan Kristus Yesus dari antara orang mati akan menghidupkan juga tubuhmu yang fana itu oleh Roh-Nya yang diam di dalam kamu? (Menurut Roma 8:11)
+Jawaban: Jika Roh Dia yang telah membangkitkan Yesus dari antara orang mati diam di dalam kamu.
+65.	Bilamanakah maka seluruh adonan juga kudus? (Menurut Roma 11:16)
+Jawaban: Jikalau roti adalah kudus.
+66.	Bilamanakah maka cabang-cabang adalah kudus? (Menurut Roma 11:16)
+Jawaban: Jikalau akar adalah kudus.
+67.	Bilamanakah maka wajiblah juga bangsa-bangsa lain itu melayani orang Yahudi dengan harta duniawi mereka? (Menurut Roma 15:27)
+Jawaban: Jika bangsa-bangsa lain telah beroleh bagian dalam harta rohani orang Yahudi.
+68.	Dengan apakah manusia menindas kebenaran? (Menurut Roma 1:18)
+Jawaban: Dengan kelaliman.
+69.	Dengan apakah mereka menggantikan kemuliaan Allah yang tidak fana? (Menurut Roma 1:23)
+Jawaban: Dengan gambaran yang mirip dengan manusia yang fana, burung-burung, binatang-binatang yang berkaki empat Atau binatang-binatang yang menjalar.
+70.	Dengan apakah mereka menggantikan kebenaran Allah? (Menurut Roma 1:25)
+Jawaban: Dengan dusta dan memuja dan menyembah makhluk dengan melupakan Penciptanya yang harus dipuji selama-Lamanya,
+71.	Dengan apakah aku melayani hukum Allah? (Menurut Roma 7:26)
+Jawaban: Akal budiku.
+72.	Dengan apakah aku melayani hukum dosa? (Menurut Roma 7:26)
+Jawaban: Tubuh insaniku.
+73.	Dengan apakah kamu memuliakan Allah dan Bapa Tuhan kita, Yesus Kristus? (Menurut Roma 15:6)
+Jawaban: Dengan satu hati dan satu suara.
+74.	Dengan apakah mereka menipu orang-orang yang tulus hatinya? (Menurut Roma 16:18)
+Jawaban: Dengan kata-kata mereka yang muluk-muluk dan bahasa mereka yang manis.
+75.	Kepada siapakah aku berhutang baik? (Menurut Roma 1:14)
+Jawaban: kepada orang Yunani, maupun kepada orang bukan Yunani, baik kepada orang Terpelajar, maupun kepada orang tidak terpelajar.
+76.	Mengapa dengan perantaraan-Nya kami menerima kasih karunia dan jabatan rasul untuk menuntun semua bangsa? (Menurut Roma 1:5)
+Jawaban: Supaya mereka percaya dan taat kepada nama-Nya.
+77.	Mengapa pertama-tama aku mengucap syukur kepada Allahku oleh Yesus Kristus atas kamu sekalian? (Menurut Roma 1:8)
+Jawaban: Sebab telah tersiar kabar tentang imanmu di seluruh bumi.
+78.	Mengapa aku mempunyai keyakinan yang kokoh dalam injil? (Menurut Roma 1:16)
+Jawaban: Karena Injil adalah kekuatan Allah yang menyelamatkan setiap orang yang percaya, pertama-tama orang Yahudi, Tetapi juga orang Yunani.
+79.	Mengapa injil adalah kekuatan Allah yang menyelamatkan setiap orang yang percaya? (Menurut Roma 1:16-17)
+Jawaban: Sebab di dalamnya nyata kebenaran Allah, yang bertolak dari iman dan memimpin kepada iman seperti ada Tertulis, Orang benar akan hidup oleh iman.
+80.	Mengapa Allah menyerahkan mereka kepada hawa nafsu yang memalukan? (Menurut Roma 1:26)
+Jawaban: Sebab isteri-isteri mereka menggantikan persetubuhan yang wajar dengan yang tak wajar.
+81.	Mengapa Allah menyerahkan mereka kepada pikiran-pikiran yang terkutuk sehingga mereka melakukan apa tidak pantas? (Menurut Roma 1:28)
+Jawaban: Karena mereka tidak merasa perlu untuk mengakui Allah.
+82.	Mengapa siapapun juga engkau, engkau sendiri tidak bebas dari salah? (Menurut Roma 2:1)
+Jawaban: Sebab dalam menghakimi orang lain, engkau menghakimi dirimu sendiri, karena engkau yang menghakimi Orang lain, melakukan hal-hal yang sama.
+83.	Mengapa segala sesuatu yang tercantum dalam kitab Taurat ditujukan kepada mereka yang hidup di bawah hukum taurat? (Menurut Roma 3:19)
+Jawaban: Supaya tersumbat setiap mulut dan seluruh dunia jatuh ke bawah hukuman Allah.
+84.	Mengapa kepada kita pun Allah memperhitungkannya? (Menurut Roma 4:24)
+Jawaban: Karena kita percaya kepada Dia yang telah membangkitkan Yesus Tuhan kita dari antara orang mati.
+85.	Mengapa kita malah bermegah juga dalam kesengsaraan kita? (Menurut Roma 5:3-4)
+Jawaban: Karena kita tahu, bahwa kesengsaraan itu menimbulkan ketekunan dan ketekunan menimbulkan tahan uji dan Tahan uji menimbulkan pengharapan.
+86.	Mengapa pengharapan tidak mengecewakan? (Menurut Roma 5:5)
+Jawaban: Karena kasih Allah telah dicurahkan di dalam hati kita oleh Roh Kudus yang telah dikaruniakan kepada kita.
+87.	Mengapa maut itu telah menjalar kepada semua orang? (Menurut Roma 5:12)
+Jawaban: Karena semua orang telah berbuat dosa.
+88.	Mengapa karunia Allah tidaklah sama dengan pelanggaran Adam? (Menurut Roma 5:15)
+Jawaban: Sebab, jika karena pelanggaran satu orang semua orang telah jatuh di dalam kuasa maut, jauh lebih besar lagi kasih Karunia Allah dan karunia-Nya yang dilimpahkan-Nya atas semua orang karena satu orang yaitu Yesus Kristus.
+89.	Mengapa kasih karunia tidak berimbangan dengan dosa satu orang? (Menurut Roma 5:16)
+Jawaban: Sebab penghakiman atas satu pelanggaran itu telah mengakibatkan penghukuman tetapi penganugerahan Karunia atas banyak pelanggaran itu mengakibatkan pembenaran.
+90.	Mengapa hukum taurat ditambahkan? (Menurut Roma 5:20)
+Jawaban: Supaya pelanggaran menjadi semakin banyak.
+91.	Mengapa kita telah dikuburkan bersama-sama dengan Dia oleh baptisan dalam kematian? (Menurut Roma 6:4)
+Jawaban: Supaya, sama seperti Kristus telah dibangkitkan dari antara orang mati oleh kemuliaan Bapa demikian juga kita Akan hidup dalam hidup yang baru.
+92.	Mengapa manusia lama kita telah turut disalibkan? (Menurut Roma 6:6)
+Jawaban: Supaya tubuh dosa kita hilang kuasanya, agar jangan kita menghambakan diri lagi kepada dosa.
+93.	Mengapa maut tidak berkuasa lagi atas Dia? (Menurut Roma 6:9-10)
+Jawaban: Sebab kematiannya adalah kematian terhadap dosa, satu kali dan untuk selama-lamanya, dan kehidupannya Adalah kehidupan bagi Allah.
+94.	Mengapa dosa jangan berkuasa lagi di dalam tubuhmu yang fana? (Menurut Roma 6:12)
+Jawaban: Supaya kamu jangan lagi menuruti keinginannya.
+95.	Mengapa kamu juga telah mati bagi hukum Taurat oleh tubuh Kristus? (Menurut Roma 7:4)
+Jawaban: Supaya kamu menjadi milik orang lain yaitu milik Dia yang telah dibangkitkan dari antara orang mati agar kita Berbuah bagi Allah.
+96.	Mengapa dosa mendapat kesempatan untuk membangkitkan di dalam diriku rupa-rupa keinginan? (Menurut Roma 7:8)
+Jawaban: Sebab tanpa hukum Taurat dosa mati.
+97.	Mengapa Ia telah menjatuhkan hukuman atas dosa di dalam daging? (Menurut Roma 8:3-4)
+
+: Supaya tuntutan hukum Taurat digenapi di dalam kita, yang tidak hidup menurut daging, tetapi menurut Roh.
+98.	Mengapa mereka juga ditentukan-Nya dari semula untuk menjadi serupa dengan gambaran Anak-Nya? (Menurut Roma 8:29)
+Jawaban: Supaya Ia Anak-Nya itu, menjadi yang sulung di antara banyak saudara.
+99.	Mengapa tidak ada perbedaan antara orang Yahudi dan orang Yunani? (Menurut Roma 10:12)
+Jawaban: Karena Allah yang satu itu adalah Tuhan dari semua orang kaya bagi semua orang yang berseru kepada-Nya.
+100.	Mengapa Allah telah mengurung semua orang dalam ketidaktaatan? (Menurut Roma 11:32)
+Jawaban: Supaya Ia dapat menunjukkan kemurahanNya atas mereka semua.
+101.	Mengapa janganlah kamu sendiri menuntut pembalasan, tetapi berilah tempat kepada murka Allah? (Menurut Roma 12:19)
+Jawaban: Sebab ada tertulis : pembalasan itu adalah hak-Ku, Akulah yang akan menuntut pembalasan, Firman Tuhan.
+102.	Mengapa tiap-tiap orang harus takhluk kepada pemerintah yang di atasnya? (Menurut Roma 13:1)
+Jawaban: Sebab tidak ada pemerintah yang tidak berasal dari Allah dan pemerintah-pemerintah yang ada ditetapkan oleh Allah.
+103.	Mengapa itulah juga sebabnya maka kamu membayar pajak? (Menurut Roma 13:6)
+Jawaban: Karena mereka yang mengurus hal itu adalah pelayan-pelayan Allah.
+104.	Mengapa janganlah kamu berhutang apa-apa kepada siapapun juga, tetapi kamu saling mengasihi? (Menurut Roma 13:8)
+Jawaban: Sebab barangsiapa mengasihi sesamanya manusia, ia sudah memenuhi hukum taurat.
+105.	Mengapa baik hidup atau mati, kita adalah milik Tuhan? (Menurut Roma 14:8)
+Jawaban: Sebab jika kita hidup, kita hidup untuk Tuhan, dan jika kita mati, kita mati untuk Tuhan.
+106.	Mengapa janganlah engkau membinasakan saudaramu oleh karena makananmu? (Menurut Roma 14:15)
+Jawaban: Karena Kristus telah mati untuk dia.
+107.	Menjadi apakah kamu yang telah dipanggil, yang juga termasuk di antara mereka? (Menurut Roma 1:6)
+Jawaban: Menjadi milik Kristus.
+108.	Menjadi apakah hati mereka yang bodoh? (Menurut Roma 1:21)
+Jawaban: Menjadi gelap.
+109.	Menjadi apakah pikiran mereka? (Men.Roma1:21)
+Jawaban: Menjadi sia-sia.
+110.	Menjadi apakah Kristus Yesus telah ditentukan Allah? (Menurut Roma 3:25)
+Jawaban: Menjadi jalan pendamaian karena iman dalam darahnya.
+111.	Menjadi apakah semua orang oleh ketaatan satu orang? (Menurut Roma 5:19)
+Jawaban: Orang benar.
+112.	Siapakah yang telah dipanggil menjadi milik Kristus? (Menurut Roma 1:6)
+Jawaban: Kamu.
+113.	Siapakah yang termasuk di antara mereka? (Menurut Roma 1:6)
+Jawaban: Kamu juga.
+114.	Siapakah yang tidak bebas dari salah? (Menurut Roma 2:1)
+Jawaban: Hai manusia, siapa pun juga engkau yang menghakimi orang lain, engkau sendiri.
+115.	Siapakah yang akan ditimpa penderitaan dan kesesakan? (Menurut Roma 2:9)
+Jawaban: Setiap orang yang hidup yang berbuat jahat pertama-tama orang Yahudi dan juga orang Yunani
+116.	Siapakah yang akan binasa tanpa hukum Taurat? (Menurut Roma 2:12)
+Jawaban: Semua orang yang berdosa tanpa hukum Taurat;
+117.	Siapakah yang akan dihakimi oleh hukum Taurat? (Menurut Roma 2:12)
+Jawaban: Semua orang yang berdosa di bawah hukum Taurat.
+118.	Siapakah yang akan dibenarkan di hadapan Allah? (Menurut Roma 2:13)
+Jawaban: orang yang melakukan hukum Tauratlah.
+119.	Siapakah yang dipanggil-Nya? (Menurut Roma 8:30)
+Jawaban: Mereka yang ditentukan-Nya dari semula, mereka itu juga
+120.	Siapakah yang dibenarkan-Nya? (Menurut Roma 8:30)
+Jawaban: Mereka yang dipanggil-Nya, mereka itu juga.
+121.	Siapakah yang dimuliakan-Nya? (Menurut Roma 8:30)
+Jawaban: Mereka yang dibenarkan-Nya, mereka itu juga.
+122.	Siapakah yang akan disebut keturunanmu? (Menurut Roma 9:7)
+Jawaban: Yang berasal dari Ishak.
+123.	Siapakah yang disebut keturunan yang benar? (Menurut Roma 9:8)
+Jawaban: Anak-anak perjanjian
+124.	Siapakah bapa leluhur kita? (Menurut Roma 9:10)
+Jawaban: Ishak.
+125.	Siapakah yang hanya makan sayur-sayuran saja? (Menurut Roma 14:2)
+Jawaban: Orang yang lemah imannya.
+126.	Siapakah yang akan memberi pertanggung jawab tentang dirinya kepada Allah? (Menurut Roma 14:12)
+Jawaban: Setiap orang di antara kita.
+127.	Siapakah yang telah mengambil keputusan untuk menyumbangkan sesuatu kepada orang-orang miskin di antara orang-orang kudus di Yerusalem? (Menurut Roma 15:26)
+Jawaban: Makedonia dan Akhaya.
+128.	Siapakah saudara kita yang melayani jemaat di Kengkrea? (Menurut Roma 16:1)
+Jawaban: Febe.
+129.	Siapakah teman-teman sekerjaku dalam Kristus Yesus? (Menurut Roma 16:3)
+Jawaban: Priskila dan Akwila.
+130.	Siapakah saudara yang kukasihi, yang adalah buah pertama dari daerah Asia untuk Kristus? (Menurut Roma 16:5)
+Jawaban: Epenetus.
+131.	Siapakah yang telah bekerja keras untuk kamu? (Menurut Roma 16:6)
+Jawaban: Maria.
+132.	Siapakah saudara-saudaraku sebangsa, yang pernah dipenjarakan bersama-sam aku? (Menurut Roma 16:7)
+Jawaban: Andronikus dan Yunias.
+133.	Siapakah Andronikus dan Yunias itu? (Menurut Roma 16:7)
+Jawaban: Yaitu orang-orang yang terpandang di antara para rasul dan yang telah menjadi Kristen sebelum aku.
+134.	Siapakah yang kukasihi dalam Tuhan? (Menurut Roma 16:8)
+Jawaban: Ampliatus.
+135.	Siapakah teman sekerja kami dalam Kristus? (Menurut Roma 16:9)
+Jawaban: Urbanus.
+136.	Siapakah yang kukasihi? (Menurut Roma 16:9)
+Jawaban: Stakhis.
+137.	Siapakah yang telah tahan uji dalam Kristus? (Menurut Roma 16:10)
+Jawaban: Apeles.
+138.	Siapakah temanku sebangsa? (Menurut Roma 16:11)
+Jawaban: Herodion.
+139.	Siapakah yang bekerja membanting tulang dalam pelayanan Tuhan? (Menurut Roma 16:12)
+Jawaban: Trifena dan Trifosa.
+140.	Siapakah yang kukasihi, yang telah bekerja membanting tulang dalam pelayanan Tuhan? (Menurut Roma 16:12)
+Jawaban: Persis.
+141.	Siapakah orang pilihan dalam Tuhan? (Menurut Roma 16:13)
+Jawaban: Rufus.
+142.	Siapakah temanku sekerja? (Menurut Roma 16:21)
+Jawaban: Timotius.
+143.	Siapakah temanku sebangsa? (Menurut Roma 16:21)
+Jawaban: Lukius, Yason dan Sosipater.
+144.	Siapakah yang memberi tumpangan kepadaku? (Menurut Roma 16:23)
+Jawaban: Gayus.
+145.	Siapakah bendahara negeri? (Menurut Roma 16:23)
+Jawaban: Erastus.
+146.	Untuk apakah Paulus, hamba Kristus Yesus dipanggil menjadi rasul dan dikuduskan? (Menurut Roma 1:1)
+Jawaban: Untuk memberitakan Injil Allah.
+147.	Untuk apakah aku ingin melihat kamu? (Menurut Roma 1:11)
+Jawaban: Untuk memberikan karunia rohani kepadamu guna menguatkan kamu.
+148.	Untuk apakah kaki mereka cepat? (Menurut Roma 3:15)
+Jawaban: Untuk menumpahkan darah.
+149.	Untuk apakah kasih karunia akan berkuasa oleh kebenaran? (Menurut Roma 5:21)
+Jawaban: untuk hidup yang kekal, oleh Yesus Kristus, Tuhan kita.
+150.	Untuk apakah kamu menyerahkan anggota-anggota tubuhmu kepada Allah? (Menurut Roma 6:13)
+Jawaban: Untuk menjadi senjata-senjata kebenaran.
+151.	Untuk apakah Allah turut bekerja dalam segala sesuatu? (Menurut Roma 8:28)
+Jawaban: Untuk mendatangkan kebaikan bagi mereka yang mengasihi Dia yaitu bagi mereka yang terpanggil sesuai dengan rencana Allah
+152.	Untuk apakah sekarang aku sedang dalam perjalanan ke Yerusalem? (Menurut Roma 15:25)
+Jawaban: Untuk mengantarkan bantuan kepada orang-orang kudus.
+
+
+`;
+
+            // ================= PARSER =================
+            function parseSoal(raw) {
+                const lines = raw.split("\n");
+                const result = [];
+                let q = "";
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (/^\d+\./.test(line)) {
+                        q = line.replace(/^\d+\.\s*/, "");
+                    } else if (line.startsWith("Jawaban:")) {
+                        let a = line.replace("Jawaban:", "").trim();
+                        result.push({ q, a });
+                    }
+                });
+
+                return result;
+            }
+
+            // ================= DATA =================
+            let data = parseSoal(rawData);
+            let index = 0;
+            let score = 0;
+
+            // ================= START =================
+            function startApp() {
+                document.getElementById("welcome").style.display = "none";
+                document.getElementById("main").style.display = "block";
+                renderHome();
+            }
+
+            // ================= HOME =================
+            function renderHome() {
+                app.innerHTML = `
+    <div class="grid">
+      <div class="menu-card" onclick="renderFlash()">
+        <i class='bx bx-layer'></i>
+        <div>Flashcard</div>
+      </div>
+      <div class="menu-card" onclick="renderQuiz()">
+        <i class='bx bx-edit'></i>
+        <div>Latihan</div>
+      </div>
+      <div class="menu-card" onclick="renderBank()">
+        <i class='bx bx-book'></i>
+        <div>Bank Soal</div>
+      </div>
+    </div>
+  `;
+            }
+
+            // ================= FLASH =================
+            function renderFlash() {
+                const item = data[index];
+                let flipped = false;
+
+                function draw() {
+                    app.innerHTML = `
+      <div class="card" onclick="flipCard()">
+        <div class="inner ${flipped ? "flip" : ""}">
+          <div class="face">${item.q}</div>
+          <div class="face back">${item.a}</div>
+        </div>
+      </div>
+      <button class="btn" onclick="next()">Next</button>
+      <button class="btn" onclick="renderHome()">Home</button>
+    `;
+                }
+
+                window.flipCard = () => {
+                    flipped = !flipped;
+                    draw();
+                };
+
+                window.next = () => {
+                    index = (index + 1) % data.length;
+                    renderFlash();
+                };
+
+                draw();
+            }
+
+            // ================= QUIZ =================
+            function renderQuiz() {
+                const item = data[index];
+
+                let options = [item.a];
+                while (options.length < 4) {
+                    let rand = data[Math.floor(Math.random() * data.length)].a;
+                    if (!options.includes(rand)) options.push(rand);
+                }
+
+                options.sort(() => Math.random() - 0.5);
+
+                app.innerHTML = `
+    <div class="card" style="height:auto;padding:20px">
+      <h3>${item.q}</h3>
+      ${options
+          .map(
+              o => `
+        <div class="option" onclick="check('${o.replace(/'/g, "")}')">${o}</div>
+      `
+          )
+          .join("")}
+    </div>
+    <button class="btn" onclick="renderHome()">Home</button>
+  `;
+            }
+
+            // ================= CHECK =================
+            window.check = function (selected) {
+                const correct = data[index].a;
+                const opts = document.querySelectorAll(".option");
+
+                opts.forEach(el => {
+                    if (el.innerText === correct) el.classList.add("correct");
+                    else if (el.innerText === selected)
+                        el.classList.add("wrong");
+                });
+
+                setTimeout(() => {
+                    index = (index + 1) % data.length;
+                    renderQuiz();
+                }, 1000);
+            };
+
+            // ================= BANK =================
+            function renderBank() {
+                app.innerHTML = `
+    ${data
+        .map(
+            (d, i) => `
+      <div class="option" onclick="jump(${i})">
+        ${i + 1}. ${d.q}
+        <br><small>${d.a}</small>
+      </div>
+    `
+        )
+        .join("")}
+    <button class="btn" onclick="renderHome()">Home</button>
+  `;
+            }
+
+            window.jump = function (i) {
+                index = i;
+                renderQuiz();
+            };
+            
+        </script>
+    </body>
+</html>
